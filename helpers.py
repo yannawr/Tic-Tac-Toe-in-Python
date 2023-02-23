@@ -1,21 +1,8 @@
-import random
-import time
 
-spots_default = {1: '1', 2: '2', 3: '3', 4: '4',
-                 5: '5', 6: '6', 7: '7', 8: '8', 9: '9'}
 
-spots = spots_default.copy()
-
-mark_1, mark_2 = 'X', 'O'
-
-players = {}
-current_player = {}
-score = {}
-turn = 1
-playing = True
 
 # board
-def draw_board():
+def draw_board(spots):
     board = (f'{spots[1]} | {spots[2]} | {spots[3]}\n'
              f'{spots[4]} | {spots[5]} | {spots[6]}\n'
              f'{spots[7]} | {spots[8]} | {spots[9]}\n')
@@ -23,7 +10,8 @@ def draw_board():
     print(board)
 
 
-def show_score(player_1, player_2):
+# score
+def show_score(player_1, player_2, score):
     score_player_1, score_player_2 = score[player_1], score[player_2]
 
     player_score = (
@@ -32,7 +20,16 @@ def show_score(player_1, player_2):
     print(player_score)
 
 
-def set_username():
+# register two players
+def register_player(players):
+    num_players = 1
+    while num_players < 3:
+        print(f'Player {num_players} must choose a username.')
+        set_username(players)
+        num_players += 1
+
+# sets each player's username
+def set_username(players):
     while True:
         username = input('Username: ')
         if len(username) < 5 or len(username) > 12 or not username.isalpha():
@@ -42,17 +39,8 @@ def set_username():
             players[username] = None
             break
 
-
-# register two players
-def register_player():
-    num_players = 1
-    while num_players < 3:
-        print(f'Player {num_players} must choose a username.')
-        set_username()
-        num_players += 1
-
-
-def set_player_mark(player_1, player_2, player):
+# sets the a mark for each player
+def set_player_mark(player_1, player_2, player, mark_1, mark_2, players, score):
     default_score = 0
     while True:
         mark = int(
@@ -61,8 +49,7 @@ def set_player_mark(player_1, player_2, player):
             if mark == 1:
                 players.update({player_1: mark_1, player_2: mark_2})
                 print(
-                    f'\n{player_1} chose "{mark_1}". {player_2} got "{mark_2}"\n')
-                # current_player.update({'Player': player_1})
+                    f'\n{player_1} chose "{mark_1}". {player_2} got "{mark_2}".\n')
                 score.update({player_1: default_score,
                              player_2: default_score})
                 break
@@ -77,27 +64,25 @@ def set_player_mark(player_1, player_2, player):
             print(f'Input must be 1 for "{mark_1}" or 2 for "{mark_2}".')
 
 
-# updates the board according to the current player's move
-def update_board(spot, player_mark):
-    spots.update({spot: player_mark})
-
-
-def draw_mark(player):
+# draws the mark into the board
+def draw_player_mark(player, spots, players, mark_1, mark_2):
     while True:
         move = input(
             f'It\'s {player}\'s turn. Choose the spot according to a number between 1-9 or hit "q" to end the game: ')
 
+        # if 'q' then returns the move to end the game
         if move == 'q':
             return move
         elif move.isdigit() and int(move) in spots:  # if str is a number
-            move = int(move) # turns str into int
+            move = int(move)  # turns str into int
             player_move = spots[move]
             player_mark = players[player]  # mark_1 or mark_2
             # if the chosen spot is already filled with mark_1 or mark_2, than asks for another spot
             if player_move == mark_1 or player_move == mark_2:
                 print('Spot already filled. Choose again.')
             else:
-                update_board(move, player_mark)
+                # updates the board according to the current player's move
+                spots[move] = player_mark
                 print('\n')
                 break
         else:
@@ -105,7 +90,7 @@ def draw_mark(player):
 
 
 # checks if there's a winner
-def check_for_win():
+def check_for_win(spots):
     # horizontal check
     if (spots[1] == spots[2] == spots[3]) \
             or (spots[4] == spots[5] == spots[6]) \
@@ -123,15 +108,7 @@ def check_for_win():
     else:
         return False
 
-
-def check_for_tie():
-    for mark in spots.values():
-        # if there is no spot with a number and there's no check_for_win(), than it's a draw
-        if mark.isdigit():
-            return False
-    return True
-
-
+# asks if the game continues
 def continue_playing_question():
     while True:
         answer = input('Continue playing? 1 - yes / 2 - no: ')
@@ -141,7 +118,8 @@ def continue_playing_question():
             print('Input must be 1 for "yes" or 2 for "no".')
 
 
-def win_msg(player_1, player_2, player):
+# if win then shows msg
+def win_msg(player_1, player_2, player, score):
     score_player_1, score_player_2 = score[player_1], score[player_2]
 
     if score_player_1 > score_player_2:
@@ -155,82 +133,23 @@ def win_msg(player_1, player_2, player):
         print(f'{player_1} and {player_2} have {score_player_1} points\n')
 
 
-def tie_msg(player_1, player_2):
+# if tie then shows msg
+def tie_msg(player_1, player_2, score, spots):
     score_player_1, score_player_2 = score[player_1], score[player_2]
 
-    draw_board()
-    # if draw
+    draw_board(spots)
+    # if tie
     if score_player_1 == score_player_2:
         print('The game ended in a tie.\n'
               f'{player_1} and {player_2} have {score_player_1} points.\n')
-    # if game ended in a draw but player 1 has more points
+    # if game ended in a tie but player 1 has more points
     elif score_player_1 > score_player_2:
         print(f'The game ended in a tie, but {player_1} made {score_player_1} points and is the winner of the match.\n'
               f'{player_2} made {score_player_2} points.\n')
-    # if game ended in a draw but player 2 has more points
+    # if game ended in a tie but player 2 has more points
     else:
         print(f'The game ended in a tie, but {player_2} made {score_player_2} points and is the winner of the match.\n'
               f'{player_1} made {score_player_1} points.\n')
 
 
-if __name__ == '__main__':
-    while playing:
-        if not players:
-            register_player()
 
-            player_1, player_2 = list(players.keys())[
-                0], list(players.keys())[1]
-
-            current_player['Player'] = random.choice(list(players.keys()))
-
-            print('Setting the first player.')
-            time.sleep(1)
-            print('.')
-            time.sleep(1)
-            print('..')
-            time.sleep(1)
-            print('...')
-            time.sleep(2)
-            player = current_player['Player']
-            print(f'The first player is: {player}\n')
-            time.sleep(1)
-
-            set_player_mark(player_1, player_2, player)
-
-        player = current_player['Player']
-
-        show_score(player_1, player_2)
-        draw_board()
-        if draw_mark(player) == 'q':
-            playing = False
-
-        # define next player
-        for i in players:
-            if i != player:
-                next_player = i
-
-        if check_for_win():
-            current_player_score = score[player] + 1
-            score[player] = current_player_score
-
-            win_msg(player_1, player_2, player)
-            if continue_playing_question() == '2':
-                playing = False
-            else:
-                turn = 1
-                next_player = player  # the winner has advantage and continues playing
-                spots.clear()
-                spots = spots_default.copy()
-
-        turn += 1
-        if turn > 9:
-            tie_msg(player_1, player_2)
-
-            if continue_playing_question() == '2':
-                playing = False
-            else:
-                turn = 1
-                spots.clear()
-                spots = spots_default.copy()
-
-        current_player.update({'Player': next_player})
