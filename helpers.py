@@ -45,10 +45,11 @@ def set_username():
 
 # register two players
 def player_register():
-    print('Player 1 must choose a username.')
-    set_username()
-    print('Player 2 must choose a username.')
-    set_username()
+    num_players = 1
+    while num_players < 3:
+        print(f'Player {num_players} must choose a username.')
+        set_username()
+        num_players += 1
 
 
 def set_player_mark(player_1, player_2, player):
