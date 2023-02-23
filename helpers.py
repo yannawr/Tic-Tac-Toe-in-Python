@@ -44,7 +44,7 @@ def set_username():
 
 
 # register two players
-def player_register():
+def register_player():
     num_players = 1
     while num_players < 3:
         print(f'Player {num_players} must choose a username.')
@@ -132,11 +132,7 @@ def check_for_tie():
     return True
 
 
-def calls_next_player(next_player):
-    current_player.update({'Player': next_player})
-
-
-def call_continue():
+def continue_playing_question():
     while True:
         answer = input('Continue playing? 1 - yes / 2 - no: ')
         if answer == '1' or answer == '2':
@@ -145,7 +141,7 @@ def call_continue():
             print('Input must be 1 for "yes" or 2 for "no".')
 
 
-def call_winner(player_1, player_2, player):
+def win_msg(player_1, player_2, player):
     score_player_1, score_player_2 = score[player_1], score[player_2]
 
     if score_player_1 > score_player_2:
@@ -159,7 +155,7 @@ def call_winner(player_1, player_2, player):
         print(f'{player_1} and {player_2} have {score_player_1} points\n')
 
 
-def call_tie(player_1, player_2):
+def tie_msg(player_1, player_2):
     score_player_1, score_player_2 = score[player_1], score[player_2]
 
     draw_board()
@@ -177,14 +173,10 @@ def call_tie(player_1, player_2):
               f'{player_1} made {score_player_1} points.\n')
 
 
-def update_score(player):
-    current_player_score = score[player] + 1
-    score[player] = current_player_score
-
 if __name__ == '__main__':
     while playing:
         if not players:
-            player_register()
+            register_player()
 
             player_1, player_2 = list(players.keys())[
                 0], list(players.keys())[1]
@@ -218,9 +210,11 @@ if __name__ == '__main__':
                 next_player = i
 
         if check_for_win():
-            update_score(player)
-            call_winner(player_1, player_2, player)
-            if call_continue() == '2':
+            current_player_score = score[player] + 1
+            score[player] = current_player_score
+
+            win_msg(player_1, player_2, player)
+            if continue_playing_question() == '2':
                 playing = False
             else:
                 turn = 1
@@ -230,13 +224,13 @@ if __name__ == '__main__':
 
         turn += 1
         if turn > 9:
-            call_tie(player_1, player_2)
+            tie_msg(player_1, player_2)
 
-            if call_continue() == '2':
+            if continue_playing_question() == '2':
                 playing = False
             else:
                 turn = 1
                 spots.clear()
                 spots = spots_default.copy()
 
-        calls_next_player(next_player)
+        current_player.update({'Player': next_player})
