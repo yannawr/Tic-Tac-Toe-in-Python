@@ -1,6 +1,3 @@
-
-
-
 # board
 def draw_board(spots):
     board = (f'{spots[1]} | {spots[2]} | {spots[3]}\n'
@@ -28,6 +25,7 @@ def register_player(players):
         set_username(players)
         num_players += 1
 
+
 # sets each player's username
 def set_username(players):
     while True:
@@ -38,6 +36,7 @@ def set_username(players):
         else:
             players[username] = None
             break
+
 
 # sets the a mark for each player
 def set_player_mark(player_1, player_2, player, mark_1, mark_2, players, score):
@@ -108,6 +107,7 @@ def check_for_win(spots):
     else:
         return False
 
+
 # asks if the game continues
 def continue_playing_question():
     while True:
@@ -150,6 +150,3 @@ def tie_msg(player_1, player_2, score, spots):
     else:
         print(f'The game ended in a tie, but {player_2} made {score_player_2} points and is the winner of the match.\n'
               f'{player_1} made {score_player_1} points.\n')
-
-
-
